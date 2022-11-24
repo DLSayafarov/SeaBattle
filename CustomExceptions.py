@@ -1,0 +1,2 @@
+class GameCustomizeException(Exception):
+    pass
