@@ -1,8 +1,9 @@
+import CustomExceptions
 from GameObjects.vector2 import Vector2
 from GameObjects.enums import Rotation
 from typing import Callable
 
-
+MAX_SHIP_LEN = 10
 class Ship:
     pos: Vector2
     hp: int
@@ -36,6 +37,8 @@ class Ship:
         self.hp = ship_len
         self.on_defeat = on_defeat
         self._parts = []
+        if self._len > MAX_SHIP_LEN or self._len < 0:
+            raise CustomExceptions.GameCustomizeException(f"Длина корабля должна быть в пределах от 1 до {MAX_SHIP_LEN}")
 
     def shoot_down(self):
         self.hp -= 1

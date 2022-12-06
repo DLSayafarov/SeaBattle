@@ -2,8 +2,13 @@ from GameObjects.common import get_neighbours
 from GameObjects.fieldCell import FieldCell, EmptyCell, ShipCell
 from GameObjects.ship import Ship
 from GameObjects.vector2 import Vector2
+from CustomExceptions import GameCustomizeException
 
 
+MIN_WIDTH = 5
+MAX_WIDTH = 20
+MIN_HEIGHT = 5
+MAX_HEIGHT = 20
 class FieldProperties:
     width: int
     height: int
@@ -13,6 +18,16 @@ class FieldProperties:
         self.width = width
         self.height = height
         self.ships = ships
+        self.check_data()
+
+    def check_data(self):
+        if self.width < MIN_WIDTH or self.width > MAX_WIDTH:
+            raise GameCustomizeException(f"Ширина поля должна быть в диапазоне от {MIN_WIDTH} до {MAX_WIDTH}")
+        if self.height < MIN_HEIGHT or self.height > MAX_HEIGHT:
+            raise GameCustomizeException(f"Высота поля должна быть в диапазоне от {MIN_HEIGHT} до {MAX_HEIGHT}")
+        if len(self.ships) == 0:
+            raise GameCustomizeException("Кол-во кораблей должно быть не нулевым")
+
 
 
 class Field:
