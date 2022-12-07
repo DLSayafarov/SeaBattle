@@ -1,8 +1,7 @@
 from GameObjects.field import Field
-import ConsoleUI.gameCustomizer as GameCustomizer
-import ConsoleUI.fieldCustomizer as FieldCustomizer
-from CustomExceptions import GameCustomizeException
-from Players.consolePlayer import ConsolePlayer
+import ___ConsoleUI.gameCustomizer as GameCustomizer
+import ___ConsoleUI.fieldCustomizer as FieldCustomizer
+from Players.___consolePlayer import ConsolePlayer
 
 
 def start_game():
@@ -20,7 +19,7 @@ def start_game():
             players[1].set_field(*fields[::-1])
             players[0].on_game_start()
             players[1].on_game_start()
-        except GameCustomizeException as e:
+        except Warning as e:
             print(f"\n\n!!{e}!!")
             print("Попробуйте указать другие игровые правила\n")
         else:

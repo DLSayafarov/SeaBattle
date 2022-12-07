@@ -1,7 +1,7 @@
 from Players.player import Player
 from GameObjects.field import Field
 from GameObjects.fieldCell import FieldCell, ShipCell, EmptyCell
-import ConsoleUI.fieldCustomizer as consoleUI
+import ___ConsoleUI.fieldCustomizer as consoleUI
 import random
 import time
 from GameObjects.vector2 import Vector2

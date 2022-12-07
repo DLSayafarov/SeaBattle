@@ -8,7 +8,7 @@ class FieldCell:
 
     def shoot_down(self):
         if self.is_shoot_down:
-            raise Exception("Already shoot down")
+            raise Warning("Already shoot down")
         self.is_shoot_down = True
 
     def __str__(self):
@@ -27,7 +27,7 @@ class ShipCell(FieldCell):
 
     def shoot_down(self):
         if self.is_shoot_down:
-            raise Exception("Already shoot down")
+            raise Warning("Already shoot down")
         self.is_shoot_down = True
         self.ship.shoot_down()
 

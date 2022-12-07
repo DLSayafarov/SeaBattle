@@ -2,8 +2,12 @@ from GameObjects.field import Field
 
 
 class Player:
-    field: Field
-    opponent_field: Field
+    own_field: Field
+    other_field: Field
+
+    def __init__(self, own_field: Field, other_field: Field):
+        self.own_field = own_field
+        self.other_field = other_field
 
     def make_move(self):
         pass

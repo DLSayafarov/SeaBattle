@@ -1,5 +1,5 @@
 from GameObjects.field import Field
-from Players.consolePlayer import ConsolePlayer
+from Players.___consolePlayer import ConsolePlayer
 
 
 def set_opponent():

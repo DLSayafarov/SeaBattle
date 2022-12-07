@@ -2,7 +2,6 @@ from GameObjects.common import get_neighbours
 from GameObjects.fieldCell import FieldCell, EmptyCell, ShipCell
 from GameObjects.ship import Ship
 from GameObjects.vector2 import Vector2
-from CustomExceptions import GameCustomizeException
 
 
 MIN_WIDTH = 5
@@ -22,11 +21,11 @@ class FieldProperties:
 
     def check_data(self):
         if self.width < MIN_WIDTH or self.width > MAX_WIDTH:
-            raise GameCustomizeException(f"Ширина поля должна быть в диапазоне от {MIN_WIDTH} до {MAX_WIDTH}")
+            raise Warning(f"Ширина поля должна быть в диапазоне от {MIN_WIDTH} до {MAX_WIDTH}")
         if self.height < MIN_HEIGHT or self.height > MAX_HEIGHT:
-            raise GameCustomizeException(f"Высота поля должна быть в диапазоне от {MIN_HEIGHT} до {MAX_HEIGHT}")
+            raise Warning(f"Высота поля должна быть в диапазоне от {MIN_HEIGHT} до {MAX_HEIGHT}")
         if len(self.ships) == 0:
-            raise GameCustomizeException("Кол-во кораблей должно быть не нулевым")
+            raise Warning("Кол-во кораблей должно быть не нулевым")
 
 
 
@@ -68,6 +67,7 @@ class Field:
 
         ship.on_defeat = lambda: self.ship_boom(ship)
         self.ships.add(ship)
+        self.ships_to_place.remove(ship)
         return True
 
     def remove_ship(self, ship: Ship):
@@ -75,6 +75,7 @@ class Field:
             for pos in ship.parts:
                 self[pos.y][pos.x] = EmptyCell()
             self.ships.remove(ship)
+            self.ships_to_place.append(ship)
 
     def try_to_shoot(self, pos: Vector2):
         if not self.is_inside(pos):

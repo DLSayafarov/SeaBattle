@@ -2,9 +2,8 @@ from random import Random
 from GameObjects.fieldCell import FieldCell, ShipCell, EmptyCell
 from GameObjects.field import Field, FieldProperties
 from GameObjects.ship import Ship
-from CustomExceptions import GameCustomizeException
 from GameObjects.vector2 import Vector2
-from GameObjects.enums import Rotation
+from GameObjects.rotation import Rotation
 
 classic_ship_set = [Ship(ship_len=4),
                     Ship(ship_len=3), Ship(ship_len=3),
@@ -35,7 +34,7 @@ def start_setting_field():
         ship_lens = map(int, input().split())
         ship_set = [Ship(ship_len=x) for x in ship_lens]
     if sum([s.len for s in ship_set]) * 2 + 2 > h * w:
-        raise GameCustomizeException("Поле слишком мало для данного набора кораблей")
+        raise Warning("Поле слишком мало для данного набора кораблей")
     print("Установлены кастомные игровые правила\n")
     return FieldProperties(w, h, ship_set)
 
@@ -62,7 +61,7 @@ def start_setting_ships_on_field(field: Field):
     ship_setting_type = int(input())
     if ship_setting_type == 1:
         if not(try_set_ships_randomly(field)):
-            raise GameCustomizeException("Не получилось расставить корабли автоматически")
+            raise Warning("Не получилось расставить корабли автоматически")
         print("Корабли расставлены автоматически\n")
     else:
         set_ships_manual(field)

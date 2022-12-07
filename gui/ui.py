@@ -1,13 +1,16 @@
+import time
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Game.game_settings import GameSettings, FieldProperties, PlayerProperties
 from GameObjects.ship import Ship
-from Players.player_properties import Difficulty
+from Players.difficulty import Difficulty
 import gui.menu_ui as menu_ui
 import gui.ship_placing_ui as ship_placing_ui
 
 MENU_UI = menu_ui.Ui_MainWindow()
 SHIP_PLACING_UI = ship_placing_ui.Ui_MainWindow()
 MAIN_WINDOW = None
+
 
 def set_game_and_field_settings():
     try:
@@ -17,7 +20,7 @@ def set_game_and_field_settings():
         MENU_UI.mines_count
         MENU_UI.minesweepers_count
     except:
-        raise Exception("Некорректные настройки")
+        raise Warning("Некорректные настройки")
 
     ships = [Ship(ship_len=x) for x in ships_lens]
     fp = FieldProperties(game_field_width, game_field_height, ships)
