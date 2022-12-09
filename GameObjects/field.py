@@ -11,12 +11,12 @@ MAX_HEIGHT = 20
 class FieldProperties:
     width: int
     height: int
-    ships: list[Ship]
+    ships_lens: list[int]
 
-    def __init__(self, width, height, ships: list[Ship]):
+    def __init__(self, width, height, ship_lens: list[int]):
         self.width = width
         self.height = height
-        self.ships = ships
+        self.ships_lens = ship_lens
         self.check_data()
 
     def check_data(self):
@@ -24,9 +24,8 @@ class FieldProperties:
             raise Warning(f"Ширина поля должна быть в диапазоне от {MIN_WIDTH} до {MAX_WIDTH}")
         if self.height < MIN_HEIGHT or self.height > MAX_HEIGHT:
             raise Warning(f"Высота поля должна быть в диапазоне от {MIN_HEIGHT} до {MAX_HEIGHT}")
-        if len(self.ships) == 0:
+        if len(self.ships_lens) == 0:
             raise Warning("Кол-во кораблей должно быть не нулевым")
-
 
 
 class Field:
@@ -34,20 +33,21 @@ class Field:
     width: int
     height: int
     ships: set[Ship]
-    ships_to_place: list[Ship]
+    ships_to_place: set[Ship]
 
     def __init__(self, field_properties: FieldProperties):
         self.field = [[EmptyCell() for __ in range(field_properties.width)] for _ in range(field_properties.height)]
         self.width = field_properties.width
         self.height = field_properties.height
         self.ships = set()
-        self.ships_to_place = [Ship(ship_len=s.len) for s in field_properties.ships]
+        self.ships_to_place = set([Ship(ship_len=x) for x in field_properties.ships_lens])
 
     def __getitem__(self, key: int):
         return self.field[key]
 
     def clear_field(self):
         self.field = [[EmptyCell() for __ in range(self.width)] for _ in range(self.height)]
+        self.ships_to_place |= self.ships
         self.ships = set()
 
     def is_inside(self, pos: Vector2):
@@ -75,7 +75,7 @@ class Field:
             for pos in ship.parts:
                 self[pos.y][pos.x] = EmptyCell()
             self.ships.remove(ship)
-            self.ships_to_place.append(ship)
+            self.ships_to_place.add(ship)
 
     def try_to_shoot(self, pos: Vector2):
         if not self.is_inside(pos):
@@ -97,4 +97,4 @@ class Field:
         return "\n".join(s)
 
     def __repr__(self):
-        return str(self)
+        return self.to_string()

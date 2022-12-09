@@ -27,7 +27,7 @@ class AutomaticShipPlacer:
         for j in range(AutomaticShipPlacer.ATTEMPTS_TO_RANDOMLY_SET_SHIPS):
             set_suc = True
             while field.ships_to_place:
-                ship = field.ships_to_place.pop()
+                ship = next(iter(field.ships_to_place))
                 if not AutomaticShipPlacer.try_place_ship(field, ship):
                     set_suc = False
                     field.clear_field()

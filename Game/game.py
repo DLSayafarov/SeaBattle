@@ -1,7 +1,7 @@
 import enum
 from typing import Callable, Union
 
-from game_settings import GameSettings
+from Game.game_settings import GameSettings
 from GameObjects.field import Field, Ship, Vector2
 from GameObjects.automatic_ship_placer import AutomaticShipPlacer
 from Players.player import Player
@@ -44,12 +44,21 @@ class Game:
         if not AutomaticShipPlacer.try_set_ships_randomly(field=self.fields[self.turn]):
             raise Warning("Не удалось расставить корабли автоматически")
 
-    def place_ship(self, ship: Ship, pos: Vector2 = None):
+    def try_place_ship(self, ship: Ship, x=-1, y=-1):
         if self.game_state != GameState.ShipPlacing:
             raise Exception("Ошибка состояний игры")
-        if pos is not None:
-            ship.pos = pos
-        self.fields[self.turn].try_place_ship(ship)
+        if x != -1:
+            ship.pos = Vector2(x, y)
+        return self.fields[self.turn].try_place_ship(ship)
+
+    def try_remove_ship(self, ship: Ship):
+        if self.game_state != GameState.ShipPlacing:
+            raise Exception("Ошибка состояний игры")
+        try:
+            self.fields[self.turn].remove_ship(ship)
+        except:
+            return False
+        return True
 
     def accept_ship_placement(self):
         if self.game_state != GameState.ShipPlacing:
