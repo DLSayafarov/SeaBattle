@@ -1,14 +1,23 @@
+from random import Random
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QLabel
-
 import gui.ui_base.game_ui as game_ui
-from GameObjects.vector2 import Vector2
-from gui.drag_widgets.ship_drag_widget import ShipWidget
-from Game.game import Game, GameState
+from Game.game import Game, GameState, ShootResult
 import gui.dialog_window as DW
 from gui.ui import UI
 from gui.ui_base.field_drawer import FieldDrawer
+
+
+HIT_PHRASES = ["Есть пробитие!", "Сюдаааа!!!", "В яблочко!", "Изи", "Есть попадание!", "Подстрелил!"]
+MISS_PHRASES = ["Oh sheesh", "Мимо!", "Не попал!", "Сплоховал!"]
+
+
+def get_hit_phrase():
+    return HIT_PHRASES[Random().randint(0, len(HIT_PHRASES) - 1)]
+
+
+def get_miss_phrase():
+    return MISS_PHRASES[Random().randint(0, len(MISS_PHRASES) - 1)]
 
 
 class GameUI(UI):
@@ -33,8 +42,10 @@ class GameUI(UI):
         self.ui.second_field_label.mousePressEvent = self._on_enemy_field_click
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height
         self.cell_size = 500 // max(width, height)
+        self.game.on_game_state_change = self._on_game_state_change
+        self.ui.accept_turn.clicked.connect(self._on_accept_turn_button_click)
 
-    def _draw_fields(self):
+    def _draw_fields(self, show_all=False):
         for lb in self.ui.first_field_label.children() + self.ui.second_field_label.children():
             lb.deleteLater()
 
@@ -47,18 +58,44 @@ class GameUI(UI):
         FieldDrawer.draw_field(self.ui.second_field_label, width, height)
 
         FieldDrawer.draw_objects(self.ui.first_field_label, field1)
-        FieldDrawer.draw_objects(self.ui.second_field_label, field2, True)
+        FieldDrawer.draw_objects(self.ui.second_field_label, field2, not show_all)
 
         FieldDrawer.draw_particles(self.ui.first_field_label, field1)
         FieldDrawer.draw_particles(self.ui.second_field_label, field2)
+        print("fields drawn")
 
     def _on_enemy_field_click(self, event: QtGui.QMouseEvent):
         in_label_pos = event.globalPos() - self.ui.second_field_label.mapToGlobal(QtCore.QPoint(0, 0))
         x, y = in_label_pos.x() / self.cell_size, in_label_pos.y() / self.cell_size
         x, y = round(x - 0.5), round(y - 0.5)
-        self.game.turn = (self.game.turn + 1) % 2
-        self.game.fields[self.game.turn].try_to_shoot(Vector2(x, y))
+        result = self.game.try_shoot(x, y)
+        if result == ShootResult.Ship:
+            self.ui.state_label.setStyleSheet("color: green;")
+            self.ui.state_label.setText(get_hit_phrase())
+        elif result == ShootResult.Miss:
+            self.ui.state_label.setStyleSheet("color: red;")
+            self.ui.state_label.setText(get_miss_phrase())
         self._draw_fields()
+
+    def _on_game_state_change(self):
+        print(self.game.game_state)
+        if self.game.game_settings.second_player_properties.is_real_player and self.game.game_state == GameState.Confirmation:
+            self.ui.turn_acception_label.setText(f"Игрок {(self.game.turn + 1) % 2 + 1}")
+            self.ui.confirm_window.show()
+            return
+        if self.game.game_state == GameState.Battle:
+            self.ui.state_label.setText("")
+            self.ui.turn_label.setText(f"ход игрока {self.game.turn + 1}")
+            return
+        if self.game.game_state == GameState.EndGame:
+            self.ui.state_label.setStyleSheet("color: green;")
+            self.ui.state_label.setText(f"Игрок {self.game.turn + 1} победил!")
+            self._draw_fields(True)
+
+    def _on_accept_turn_button_click(self):
+        self.game.confirm_turn_changing()
+        self._draw_fields()
+        self.ui.confirm_window.hide()
 
     def _on_back_button_click(self):
         DW.show_accept_window("Выйти в меню?", on_accept=self._back_to_menu)
