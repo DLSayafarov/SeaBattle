@@ -51,3 +51,4 @@ class ShipWidget(QtWidgets.QLabel):
             self.set_pixmap()
 
 
+
