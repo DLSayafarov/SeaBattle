@@ -4,7 +4,7 @@ from Game.game_settings import GameSettings, FieldProperties, PlayerProperties
 from Players.difficulty import Difficulty
 import gui.ui_base.menu_ui as menu_ui
 from Game.game import Game
-import gui.warning_window as WW
+import gui.dialog_window as DW
 from gui.ui import UI
 
 
@@ -37,7 +37,7 @@ class MenuUI(UI):
         try:
             game_settings = self._get_game_and_field_settings()
         except Exception as e:
-            WW.show_warning(e)
+            DW.show_warning_window(e)
         else:
             game = Game(game_settings, lambda: None)
             game.start()

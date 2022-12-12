@@ -5,7 +5,7 @@ from random import Random
 
 class AutomaticShipPlacer:
     ATTEMPTS_TO_PLACE_SHIP = 100
-    ATTEMPTS_TO_RANDOMLY_SET_SHIPS = 1000
+    ATTEMPTS_TO_RANDOMLY_SET_SHIPS = 100
 
     @staticmethod
     def try_place_ship(field: Field, ship: Ship):

@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from typing import Callable
 from GameObjects.ship import Ship
 from GameObjects.rotation import Rotation
+from gui.ui_base import images_source
 
 
 class ShipWidget(QtWidgets.QLabel):
@@ -17,8 +18,7 @@ class ShipWidget(QtWidgets.QLabel):
         self.set_pixmap()
 
     def set_pixmap(self):
-        rot = "r" if self.ship.rotation == Rotation.Horizontal else ""
-        pixmap = QtGui.QPixmap(f"gui/sprites/ships/{self.ship.len}{rot}.png")
+        pixmap = QtGui.QPixmap(images_source.get_ship_image_path(self.ship))
         size = [pixmap.width() * self.scale, pixmap.height() * self.scale]
         self.setFixedSize(*size)
         self.setPixmap(pixmap.scaled(*size, QtCore.Qt.IgnoreAspectRatio))

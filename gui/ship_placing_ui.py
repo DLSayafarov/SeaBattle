@@ -1,10 +1,11 @@
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
 import gui.ui_base.ship_placing_ui as ship_placing_ui
-from gui.drag_widgets.drag_widget import ShipWidget
+from gui.drag_widgets.ship_drag_widget import ShipWidget
 from Game.game import Game, GameState
-import gui.warning_window as WW
+import gui.dialog_window as DW
 from gui.ui import UI
+from gui.ui_base.field_drawer import FieldDrawer
 
 
 class ShipPlacingUI(UI):
@@ -19,7 +20,6 @@ class ShipPlacingUI(UI):
     def _on_back_button_click(self):
         from gui.menu_ui import MenuUI
         MenuUI.setup_ui(self.main_window, self.on_ui_change)
-        del self
 
     def _on_ship_taking(self, ship_widget: ShipWidget):
         self.game.try_remove_ship(ship_widget.ship)
@@ -42,7 +42,7 @@ class ShipPlacingUI(UI):
         try:
             self.game.place_ship_automatically()
         except Warning as e:
-            WW.show_warning(e)
+            DW.show_warning_window(e)
         else:
             for ship_widget in self.ships_widgets:
                 in_field_pos = QtCore.QPoint(ship_widget.ship.pos.x * self.cell_size,
@@ -77,45 +77,28 @@ class ShipPlacingUI(UI):
             self.ui.ship_area_layout.layout().addWidget(x)
 
     def _draw_field(self):
-        pixmap = QtGui.QPixmap("gui/sprites/field.png").scaled(500, 500)
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height
-        scale_w = 20 / width
-        scale_h = 20 / height
-        scale = min(scale_h, scale_w)
+        FieldDrawer.draw_field(self.ui.field_label, width, height)
         self.cell_size = 500 // max(width, height)
-
-        pixmap = pixmap.scaled(int(pixmap.width() * scale), int(pixmap.height() * scale))
-
-        self.ui.field_label.setPixmap(pixmap)
-        if width < height:
-            self.ui.field_label.setFixedWidth(500 * (width / height))
-        elif width > height:
-            self.ui.field_label.setFixedHeight(500 * (height / width))
-
-        window_center = QtCore.QPoint(self.main_window.width() // 2, self.main_window.height() // 2)
-        w_h = QtCore.QPoint(self.ui.field_label.width() // 2, self.ui.field_label.height() // 2)
-        self.ui.field_label.move(window_center - w_h)
 
     def _on_accept_button_click(self):
         try:
             self.game.accept_ship_placement()
         except Warning as e:
-            WW.show_warning(e)
+            DW.show_warning_window(e)
         else:
             if self.game.game_state == GameState.ShipPlacing:
                 new_ui = ShipPlacingUI.setup_ui(self.main_window, self.on_ui_change, self.game)
                 new_ui.ui.turn_label.setText("игрок 2")
             else:
-                print(self.game.fields[0])
-                print()
-                print(self.game.fields[1])
-                from gui.menu_ui import MenuUI
-                MenuUI.setup_ui(self.main_window, self.on_ui_change)
+                from gui.game_ui import GameUI
+                GameUI.setup_ui(self.main_window, self.on_ui_change, self.game)
 
     def clear(self):
         for x in self.ships_widgets:
             x.deleteLater()
         del self.ships_widgets
+        self.ui = None
 
     def __del__(self):
         print("deleted", self)
