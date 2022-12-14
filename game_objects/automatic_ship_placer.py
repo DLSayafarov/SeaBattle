@@ -1,5 +1,5 @@
-from GameObjects.field import Field, Ship, Vector2
-from GameObjects.rotation import Rotation
+from game_objects.field import Field, Ship, Vector2
+from game_objects.rotation import Rotation
 from random import Random
 
 

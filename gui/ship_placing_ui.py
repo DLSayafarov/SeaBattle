@@ -2,7 +2,7 @@ from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
 import gui.ui_base.ship_placing_ui as ship_placing_ui
 from gui.drag_widgets.ship_drag_widget import ShipWidget
-from Game.game import Game, GameState
+from game.game import Game, GameState
 import gui.dialog_window as DW
 from gui.ui import UI
 from gui.ui_base.field_drawer import FieldDrawer

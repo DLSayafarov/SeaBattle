@@ -1,22 +1,11 @@
-import asyncio
 import enum
-import threading
-import time
 from typing import Callable, Union
-
-from Game.game_settings import GameSettings
-from GameObjects.field import Field, Ship, Vector2
-from GameObjects.automatic_ship_placer import AutomaticShipPlacer
-from GameObjects.fieldCell import ShipCell
-from Players.player import Player
-from Players.bot import Bot
-from tools.run_after_delay import Sleeper
-
-
-class ShootResult(enum.IntEnum):
-    Miss = 0
-    Ship = 1
-    Err = 2
+from game.game_settings import GameSettings
+from game_objects.field import Field, Ship, Vector2
+from game_objects.automatic_ship_placer import AutomaticShipPlacer
+from game_objects.fieldCell import ShipCell, CellType
+from players.player import Player
+from players.bot import Bot
 
 
 class GameState(enum.IntEnum):
@@ -87,28 +76,28 @@ class Game:
             self.game_state = GameState.Battle
         elif self.turn == 0 and self.game_settings.second_player_properties.is_real_player:
             self.turn = 1
-        threading.Thread(target=self.on_game_state_change).start()
+        self.on_game_state_change()
 
     def get_current_player(self):
         return [self.player1, self.player2][self.turn]
 
-    def try_shoot(self, x, y, from_bot_req=False) -> ShootResult:
+    def try_shoot(self, x, y, from_bot_req=False) -> CellType:
         if isinstance(self.get_current_player(), Bot) and not from_bot_req:
-            return ShootResult.Err
+            return CellType.NotCell
         if self.game_state != GameState.Battle:
-            return ShootResult.Err
-        suc = self.get_current_player().other_field.try_to_shoot(Vector2(x, y))
-        if not suc:
-            return ShootResult.Err
+            return CellType.NotCell
+        res = self.get_current_player().other_field.try_to_shoot(Vector2(x, y))
+        if res == CellType.NotCell:
+            return res
 
-        if isinstance(self.get_current_player().other_field.field[y][x], ShipCell):
+        if res == CellType.ShipCell:
             if any(1 for x in self.get_current_player().other_field.ships if x.is_alive):
                 self._change_state_to(GameState.Battle)
-                return ShootResult.Ship
+                return CellType.ShipCell
             self.end_game()
-            return ShootResult.Err
+            return CellType.NotCell
         self._change_state_to(GameState.Waiting)
-        return ShootResult.Miss
+        return CellType.EmptyCell
 
     def accept_turn_end(self):
         self.turn = (self.turn + 1) % 2
@@ -130,8 +119,8 @@ class Game:
         if isinstance(cur_player, Player):
             return
         self.confirm_turn_start()
-        res = ShootResult.Ship
-        while res == ShootResult.Ship:
+        res = CellType.ShipCell
+        while res == CellType.ShipCell:
             x, y = cur_player.make_move()
             res = self.try_shoot(x, y, True)
         self.accept_turn_end()

@@ -1,4 +1,4 @@
-from GameObjects.field import Field
+from game_objects.field import Field
 
 
 class Player:

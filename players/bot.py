@@ -1,6 +1,6 @@
-from GameObjects.field import Field
-from Players.player_properties import PlayerProperties, Difficulty
-from Players.bot_strategies import BotGameStrategy, BotShipPlacementStrategy, \
+from game_objects.field import Field
+from players.player_properties import PlayerProperties, Difficulty
+from players.bot_strategies import BotGameStrategy, BotShipPlacementStrategy, \
     get_bot_game_strategy, get_bot_ship_placement_strategy
 
 

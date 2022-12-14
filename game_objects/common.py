@@ -1,4 +1,4 @@
-from GameObjects.vector2 import Vector2
+from game_objects.vector2 import Vector2
 from typing import Union
 
 

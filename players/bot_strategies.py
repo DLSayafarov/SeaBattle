@@ -1,13 +1,13 @@
 import enum
 from abc import ABC
 from random import Random
-from GameObjects.field import Field
-from GameObjects.automatic_ship_placer import AutomaticShipPlacer
-from GameObjects.fieldCell import ShipCell
-from GameObjects.rotation import Rotation
-from GameObjects.ship import Ship
-from GameObjects.vector2 import Vector2
-from Players.difficulty import Difficulty
+from game_objects.field import Field
+from game_objects.automatic_ship_placer import AutomaticShipPlacer
+from game_objects.fieldCell import ShipCell
+from game_objects.rotation import Rotation
+from game_objects.ship import Ship
+from game_objects.vector2 import Vector2
+from players.difficulty import Difficulty
 
 
 class StrategyStage(enum.IntEnum):
@@ -79,8 +79,6 @@ class BotGameStrategyEasy(BotGameStrategy):
             dx = int(shot_down_ship_cells[0][0] - shot_down_ship_cells[1][0] != 0)
             av_dir = [(dx, dy), (-dx, dy), (dx, -dy), (-dx, -dy)]
 
-        print(shot_down_ship_cells)
-        print(av_dir)
         for j, i in av_dir:
             for x, y in shot_down_ship_cells:
                 if (self.other_field.is_inside(Vector2(x + j, y + i))
@@ -114,7 +112,6 @@ class BotGameStrategyHard(BotGameStrategy):
                     prop = probabilities[i][j]
                     x = j
                     y = i
-        [print(*x, sep='\t') for x in probabilities]
         return x, y
 
     def get_ship_probability(self, ship):

@@ -1,5 +1,5 @@
-from GameObjects.vector2 import Vector2
-from GameObjects.rotation import Rotation
+from game_objects.vector2 import Vector2
+from game_objects.rotation import Rotation
 from typing import Callable
 
 MAX_SHIP_LEN = 10

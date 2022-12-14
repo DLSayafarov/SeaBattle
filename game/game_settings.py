@@ -1,5 +1,5 @@
-from GameObjects.field import FieldProperties
-from Players.player_properties import PlayerProperties
+from game_objects.field import FieldProperties
+from players.player_properties import PlayerProperties
 
 
 class GameSettings:

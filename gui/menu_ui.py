@@ -1,9 +1,9 @@
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
-from Game.game_settings import GameSettings, FieldProperties, PlayerProperties
-from Players.difficulty import Difficulty
+from game.game_settings import GameSettings, FieldProperties, PlayerProperties
+from players.difficulty import Difficulty
 import gui.ui_base.menu_ui as menu_ui
-from Game.game import Game
+from game.game import Game
 import gui.dialog_window as DW
 from gui.ui import UI
 
@@ -18,13 +18,13 @@ class MenuUI(UI):
         try:
             game_field_width = int(self.ui.game_field_width.text())
             game_field_height = int(self.ui.game_field_height.text())
+            mines_count = int(self.ui.mines_count.text())
+            minesweepers_count = int(self.ui.minesweepers_count.text())
             ships_lens = [int(x) for x in self.ui.ships_lens.text().split()]
-            self.ui.mines_count
-            self.ui.minesweepers_count
         except:
             raise Warning("Некорректные настройки")
 
-        fp = FieldProperties(game_field_width, game_field_height, ships_lens)
+        fp = FieldProperties(game_field_width, game_field_height, ships_lens, mines_count, minesweepers_count)
         pp = PlayerProperties()
         pp.is_real_player = self.ui.second_player_hotseat_rb.isChecked()
         if not pp.is_real_player:

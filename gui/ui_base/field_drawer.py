@@ -2,7 +2,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QLabel
 
-from GameObjects.field import Field
+from game_objects.field import Field
 from gui.ui_base import images_source
 
 

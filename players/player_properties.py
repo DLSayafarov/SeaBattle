@@ -1,4 +1,4 @@
-from Players.difficulty import Difficulty
+from players.difficulty import Difficulty
 
 
 class PlayerProperties:

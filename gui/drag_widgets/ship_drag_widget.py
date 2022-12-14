@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from typing import Callable
-from GameObjects.ship import Ship
-from GameObjects.rotation import Rotation
+from game_objects.ship import Ship
+from game_objects.rotation import Rotation
 from gui.ui_base import images_source
 
 

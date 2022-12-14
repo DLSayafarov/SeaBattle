@@ -1,6 +1,6 @@
-from GameObjects.fieldCell import FieldCell, ShipCell, EmptyCell
-from GameObjects.rotation import Rotation
-from GameObjects.ship import Ship
+from game_objects.fieldCell import FieldCell, ShipCell, EmptyCell
+from game_objects.rotation import Rotation
+from game_objects.ship import Ship
 
 
 def get_ship_image_path(ship: Ship):

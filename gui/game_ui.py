@@ -1,11 +1,10 @@
-import threading
-import time
 from random import Random
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
 import gui.ui_base.game_ui as game_ui
-from Game.game import Game, GameState, ShootResult
+from game.game import Game, GameState
 import gui.dialog_window as DW
+from game_objects.fieldCell import CellType
 from gui.ui import UI
 from gui.ui_base.field_drawer import FieldDrawer
 
@@ -73,16 +72,15 @@ class GameUI(UI):
         x, y = in_label_pos.x() / self.cell_size, in_label_pos.y() / self.cell_size
         x, y = round(x - 0.5), round(y - 0.5)
         result = self.game.try_shoot(x, y)
-        if result == ShootResult.Ship:
+        if result == CellType.ShipCell:
             self.ui.state_label.setStyleSheet("color: green;")
             self.ui.state_label.setText(get_hit_phrase())
-        elif result == ShootResult.Miss:
+        elif result == CellType.EmptyCell:
             self.ui.state_label.setStyleSheet("color: red;")
             self.ui.state_label.setText(get_miss_phrase())
 
     def _on_game_change(self):
         self._draw_fields()
-        print(self.game.game_state, self.game.turn)
         if self.game.game_settings.second_player_properties.is_real_player and self.game.game_state == GameState.Confirmation:
             self.ui.turn_acception_label.setText(f"Игрок {self.game.turn + 1}")
             self.ui.confirm_window.show()
