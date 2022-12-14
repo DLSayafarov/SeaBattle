@@ -10,6 +10,7 @@ from GameObjects.automatic_ship_placer import AutomaticShipPlacer
 from GameObjects.fieldCell import ShipCell
 from Players.player import Player
 from Players.bot import Bot
+from tools.run_after_delay import Sleeper
 
 
 class ShootResult(enum.IntEnum):
@@ -86,12 +87,14 @@ class Game:
             self.game_state = GameState.Battle
         elif self.turn == 0 and self.game_settings.second_player_properties.is_real_player:
             self.turn = 1
-        self.on_game_state_change()
+        threading.Thread(target=self.on_game_state_change).start()
 
     def get_current_player(self):
         return [self.player1, self.player2][self.turn]
 
-    def try_shoot(self, x, y) -> ShootResult:
+    def try_shoot(self, x, y, from_bot_req=False) -> ShootResult:
+        if isinstance(self.get_current_player(), Bot) and not from_bot_req:
+            return ShootResult.Err
         if self.game_state != GameState.Battle:
             return ShootResult.Err
         suc = self.get_current_player().other_field.try_to_shoot(Vector2(x, y))
@@ -99,30 +102,40 @@ class Game:
             return ShootResult.Err
 
         if isinstance(self.get_current_player().other_field.field[y][x], ShipCell):
-            if any(1 for x in self.get_current_player().other_field.ships if x.hp > 0):
+            if any(1 for x in self.get_current_player().other_field.ships if x.is_alive):
+                self._change_state_to(GameState.Battle)
                 return ShootResult.Ship
-            self._change_state_to(GameState.EndGame)
+            self.end_game()
             return ShootResult.Err
-        threading.Thread(target=self._change_turn_with_delay).start()
+        self._change_state_to(GameState.Waiting)
         return ShootResult.Miss
 
-    def _change_turn_with_delay(self):
-        self._change_state_to(GameState.Waiting)
-        time.sleep(self.turn_delay)
-        self._change_turn()
-
-    def _change_turn(self):
-        if isinstance(self.player2, Player):
-            self._change_state_to(GameState.Confirmation)
+    def accept_turn_end(self):
         self.turn = (self.turn + 1) % 2
+        self._change_state_to(GameState.Confirmation)
+        if self.game_state == GameState.Confirmation:
+            self._make_move()
 
     def _change_state_to(self, state: GameState):
+        if self.game_state == GameState.EndGame:
+            return
         self.game_state = state
         self.on_game_state_change()
 
-    def confirm_turn_changing(self):
-        if self.game_state != GameState.Confirmation:
-            raise Exception("Ошибка состояний игры")
+    def confirm_turn_start(self):
         self._change_state_to(GameState.Battle)
 
+    def _make_move(self):
+        cur_player = self.get_current_player()
+        if isinstance(cur_player, Player):
+            return
+        self.confirm_turn_start()
+        res = ShootResult.Ship
+        while res == ShootResult.Ship:
+            x, y = cur_player.make_move()
+            res = self.try_shoot(x, y, True)
+        self.accept_turn_end()
+        self.confirm_turn_start()
 
+    def end_game(self):
+        self._change_state_to(GameState.EndGame)

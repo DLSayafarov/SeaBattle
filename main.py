@@ -17,6 +17,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
+    MainWindow.setFixedSize(1500, 800)
     MenuUI.setup_ui(MainWindow, on_ui_changed)
     MainWindow.show()
     sys.exit(app.exec_())

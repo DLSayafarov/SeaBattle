@@ -14,13 +14,17 @@ class Ship:
 
     @property
     def parts(self):
-        return list(self.get_parts())
+        return list(self._get_parts())
 
     @property
     def len(self):
         return self._len
 
-    def get_parts(self):
+    @property
+    def is_alive(self):
+        return self.hp > 0
+
+    def _get_parts(self):
         p = (0, 1) if self.rotation == Rotation.Vertical else (1, 0)
         vp = Vector2(p[0], p[1])
         cp = Vector2(self.pos)

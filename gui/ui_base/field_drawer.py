@@ -39,7 +39,7 @@ class FieldDrawer:
         labels = []
 
         for ship in field.ships:
-            if only_marked and ship.hp > 0:
+            if only_marked and ship.is_alive:
                 continue
             ship_label = QLabel(label)
             pixmap = QtGui.QPixmap(images_source.get_ship_image_path(ship))

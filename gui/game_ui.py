@@ -1,3 +1,5 @@
+import threading
+import time
 from random import Random
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -42,7 +44,7 @@ class GameUI(UI):
         self.ui.second_field_label.mousePressEvent = self._on_enemy_field_click
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height
         self.cell_size = 500 // max(width, height)
-        self.game.on_game_state_change = self._on_game_state_change
+        self.game.on_game_state_change = lambda: self._on_game_change()
         self.ui.accept_turn.clicked.connect(self._on_accept_turn_button_click)
 
     def _draw_fields(self, show_all=False):
@@ -53,18 +55,20 @@ class GameUI(UI):
         if self.game.turn == 1:
             (field1, field2) = (field2, field1)
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height
-
         FieldDrawer.draw_field(self.ui.first_field_label, width, height)
         FieldDrawer.draw_field(self.ui.second_field_label, width, height)
-
         FieldDrawer.draw_objects(self.ui.first_field_label, field1)
         FieldDrawer.draw_objects(self.ui.second_field_label, field2, not show_all)
-
         FieldDrawer.draw_particles(self.ui.first_field_label, field1)
         FieldDrawer.draw_particles(self.ui.second_field_label, field2)
-        print("fields drawn")
 
     def _on_enemy_field_click(self, event: QtGui.QMouseEvent):
+        if self.game.game_state == GameState.EndGame:
+            return
+        self.ui.state_label.setText("")
+        if self.game.game_state == GameState.Waiting:
+            self.game.accept_turn_end()
+            return
         in_label_pos = event.globalPos() - self.ui.second_field_label.mapToGlobal(QtCore.QPoint(0, 0))
         x, y = in_label_pos.x() / self.cell_size, in_label_pos.y() / self.cell_size
         x, y = round(x - 0.5), round(y - 0.5)
@@ -75,26 +79,25 @@ class GameUI(UI):
         elif result == ShootResult.Miss:
             self.ui.state_label.setStyleSheet("color: red;")
             self.ui.state_label.setText(get_miss_phrase())
-        self._draw_fields()
 
-    def _on_game_state_change(self):
-        print(self.game.game_state)
+    def _on_game_change(self):
+        self._draw_fields()
+        print(self.game.game_state, self.game.turn)
         if self.game.game_settings.second_player_properties.is_real_player and self.game.game_state == GameState.Confirmation:
-            self.ui.turn_acception_label.setText(f"Игрок {(self.game.turn + 1) % 2 + 1}")
+            self.ui.turn_acception_label.setText(f"Игрок {self.game.turn + 1}")
             self.ui.confirm_window.show()
-            return
-        if self.game.game_state == GameState.Battle:
-            self.ui.state_label.setText("")
+        elif self.game.game_state == GameState.Battle:
             self.ui.turn_label.setText(f"ход игрока {self.game.turn + 1}")
-            return
-        if self.game.game_state == GameState.EndGame:
+        elif self.game.game_state == GameState.EndGame:
             self.ui.state_label.setStyleSheet("color: green;")
             self.ui.state_label.setText(f"Игрок {self.game.turn + 1} победил!")
+            if not self.game.game_settings.second_player_properties.is_real_player:
+                self.game.turn = 0
             self._draw_fields(True)
+            return
 
     def _on_accept_turn_button_click(self):
-        self.game.confirm_turn_changing()
-        self._draw_fields()
+        self.game.confirm_turn_start()
         self.ui.confirm_window.hide()
 
     def _on_back_button_click(self):
@@ -106,6 +109,8 @@ class GameUI(UI):
 
     def clear(self):
         self.ui = None
+        self.game = None
+        self.main_window = None
 
     def __del__(self):
         print("deleted", self)

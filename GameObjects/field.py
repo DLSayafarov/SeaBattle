@@ -54,6 +54,9 @@ class Field:
         return 0 <= pos.x < self.width and 0 <= pos.y < self.height
 
     def try_place_ship(self, ship: Ship):
+        if ship not in self.ships_to_place:
+            return False
+
         for p in ship.parts:
             if not self.is_inside(p) or not(isinstance(self[p.y][p.x], EmptyCell)):
                 return False

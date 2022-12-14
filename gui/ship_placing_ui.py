@@ -97,7 +97,7 @@ class ShipPlacingUI(UI):
     def clear(self):
         for x in self.ships_widgets:
             x.deleteLater()
-        del self.ships_widgets
+        self.ships_widgets = None
         self.ui = None
 
     def __del__(self):
