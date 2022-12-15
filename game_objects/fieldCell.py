@@ -65,8 +65,8 @@ class MineCell(OneCellObject):
 
 
 class MinesweeperCell(OneCellObject):
-    char = "b"
-    char_shooted = "B"
+    char = "m"
+    char_shooted = "M"
     cell_type = CellType.MinesweeperCell
 
 

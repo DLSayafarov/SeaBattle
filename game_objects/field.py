@@ -56,10 +56,15 @@ class Field:
     def __getitem__(self, key: int):
         return self.field[key]
 
-    def clear_field(self):
-        self.field = [[EmptyCell() for __ in range(self.width)] for _ in range(self.height)]
-        self.ships_to_place |= self.ships
-        self.ships = set()
+    def clear_ships(self):
+        for s in list(self.ships):
+            self.remove_ship(s)
+
+    def clear_ocb(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                if self[i][j].cell_type in [CellType.MineCell, CellType.MinesweeperCell]:
+                    self.remove_one_cell_object(i, j)
 
     def is_inside(self, pos: Vector2):
         return 0 <= pos.x < self.width and 0 <= pos.y < self.height
@@ -68,14 +73,14 @@ class Field:
         if object_cell not in self.one_cell_objects_to_place:
             return False
 
-        if not self.is_inside(Vector2(x, y)) or not(isinstance(self[y][x], EmptyCell)):
+        if not self.is_inside(Vector2(x, y)) or self[y][x].cell_type != CellType.EmptyCell:
             return False
 
         for p in Common.get_neighbours(Vector2(x, y)):
-            if self.is_inside(p) and not(isinstance(self[p.y][p.x], EmptyCell)):
+            if self.is_inside(p) and self[y][x].cell_type != CellType.EmptyCell:
                 return False
 
-        self[y][x] = FieldCell.get_by_cell_type(object_cell)
+        self[y][x] = FieldCell.get_by_cell_type(object_cell)()
         self.one_cell_objects.append(object_cell)
         self.one_cell_objects_to_place.remove(object_cell)
         return True
@@ -85,11 +90,11 @@ class Field:
             return False
 
         for p in ship.parts:
-            if not self.is_inside(p) or not(isinstance(self[p.y][p.x], EmptyCell)):
+            if not self.is_inside(p) or self[p.y][p.x].cell_type != CellType.EmptyCell:
                 return False
 
         for p in Common.get_neighbours(ship.parts):
-            if self.is_inside(p) and not(isinstance(self[p.y][p.x], EmptyCell)):
+            if self.is_inside(p) and self[p.y][p.x].cell_type != CellType.EmptyCell:
                 return False
 
         for p in ship.parts:
@@ -106,6 +111,12 @@ class Field:
                 self[pos.y][pos.x] = EmptyCell()
             self.ships.remove(ship)
             self.ships_to_place.add(ship)
+
+    def remove_one_cell_object(self, x: int, y: int):
+        if self[y][x].cell_type in self.one_cell_objects:
+            self[y][x] = EmptyCell()
+            self.one_cell_objects.remove(self[y][x].cell_type)
+            self.one_cell_objects_to_place.append(self[y][x].cell_type)
 
     def try_to_shoot(self, pos: Vector2):
         if not self.is_inside(pos):

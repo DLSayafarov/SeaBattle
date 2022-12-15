@@ -1,6 +1,7 @@
 from typing import Callable
 from PyQt5 import QtWidgets, QtGui, QtCore
 import gui.ui_base.ship_placing_ui as ship_placing_ui
+from gui.drag_widgets.one_cell_object_drag_widget import OneCellObjectWidget
 from gui.drag_widgets.ship_drag_widget import ShipWidget
 from game.game import Game, GameState
 import gui.dialog_window as DW
@@ -33,6 +34,18 @@ class ShipPlacingUI(UI):
         else:
             self.ui.ship_area_layout.layout().addWidget(ship_widget)
 
+    def _on_one_cell_object_taking(self, ocb_widget: OneCellObjectWidget):
+        self.game.try_remove_one_cell_object(ocb_widget.field_pos.x, ocb_widget.field_pos.y)
+
+    def _on_one_cell_object_realise(self, ocb_widget: OneCellObjectWidget):
+        x, y = self._get_pos_in_field(ocb_widget.pos())
+        if self.game.try_place_one_cell_object(ocb_widget.cell_type, x, y):
+            pos_in_field = QtCore.QPoint(x * self.cell_size, y * self.cell_size)
+            new_pos = self.ui.field_label.pos() + pos_in_field
+            ocb_widget.move(new_pos)
+        else:
+            self.ui.other_objects_area_layout.layout().addWidget(ocb_widget)
+
     def _get_pos_in_field(self, ship_widget_pos: QtCore.QPoint):
         temp_pos = ship_widget_pos - self.ui.field_label.pos()
         x, y = temp_pos.x() / self.cell_size, temp_pos.y() / self.cell_size
@@ -50,6 +63,19 @@ class ShipPlacingUI(UI):
                 ship_widget.setParent(ship_widget.base_parent_widget)
                 ship_widget.set_pixmap()
                 ship_widget.move(self.ui.field_label.pos() + in_field_pos)
+
+    def _on_auto_ocb_place_button_click(self):
+        try:
+            self.game.place_one_cell_objects_automatically()
+        except Warning as e:
+            DW.show_warning_window(e)
+        else:
+            for ocb_widget in self.one_cell_objects_widgets:
+                in_field_pos = QtCore.QPoint(ocb_widget.field_pos.x * self.cell_size,
+                                             ocb_widget.field_pos.y * self.cell_size)
+                ocb_widget.setParent(ocb_widget.base_parent_widget)
+                ocb_widget.set_pixmap()
+                ocb_widget.move(self.ui.field_label.pos() + in_field_pos)
 
     def _on_reset_button_click(self):
         for ship_widget in self.ships_widgets:
@@ -69,12 +95,20 @@ class ShipPlacingUI(UI):
         self.ui.back_button.clicked.connect(self._on_back_button_click)
         self.ui.accept_button.clicked.connect(self._on_accept_button_click)
         self.ui.auto_ship_place_button.clicked.connect(self._on_auto_ship_place_button_click)
+        self.ui.auto_ocb_place_button.clicked.connect(self._on_auto_ocb_place_button_click)
         self.ui.reset_button.clicked.connect(self._on_reset_button_click)
         self.ships_widgets = [ShipWidget(x, self.cell_size, self._on_ship_taking,
                                          self._on_ship_realise, self.main_window)
                               for x in self.game.fields[self.game.turn].ships_to_place]
         for x in self.ships_widgets:
             self.ui.ship_area_layout.layout().addWidget(x)
+
+        self.one_cell_objects_widgets = [OneCellObjectWidget(x, self.cell_size,
+                                                             self._on_one_cell_object_taking,
+                                                             self._on_one_cell_object_realise, self.main_window)
+                                         for x in self.game.fields[self.game.turn].one_cell_objects_to_place]
+        for x in self.one_cell_objects_widgets:
+            self.ui.other_objects_area_layout.layout().addWidget(x)
 
     def _draw_field(self):
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height

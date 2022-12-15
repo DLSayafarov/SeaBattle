@@ -182,6 +182,14 @@ class Ui_MainWindow(object):
         font.setFamily("Georgia")
         self.auto_ship_place_button.setFont(font)
         self.auto_ship_place_button.setObjectName("auto_ship_place_button")
+        self.auto_ocb_place_button = QtWidgets.QPushButton(self.centralwidget)
+        self.auto_ocb_place_button.setGeometry(QtCore.QRect(1050, 610, 281, 41))
+        self.auto_ocb_place_button.setSizePolicy(sizePolicy)
+        self.auto_ocb_place_button.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Georgia")
+        self.auto_ocb_place_button.setFont(font)
+        self.auto_ocb_place_button.setObjectName("auto_ship_place_button")
         self.field_label = QtWidgets.QLabel(self.centralwidget)
         self.field_label.setGeometry(QtCore.QRect(500, 120, 500, 500))
         self.field_label.setText("")
@@ -203,6 +211,7 @@ class Ui_MainWindow(object):
         self.back_button.setText(_translate("MainWindow", "< Назад"))
         self.label_5.setText(_translate("MainWindow", "<html><head/><body><p>другое</p></body></html>"))
         self.auto_ship_place_button.setText(_translate("MainWindow", "Расставить автоматически"))
+        self.auto_ocb_place_button.setText(_translate("MainWindow", "Расставить автоматически"))
 
 
 if __name__ == "__main__":

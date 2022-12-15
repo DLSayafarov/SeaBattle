@@ -2,7 +2,7 @@ import enum
 from abc import ABC
 from random import Random
 from game_objects.field import Field
-from game_objects.automatic_ship_placer import AutomaticShipPlacer
+from game_objects.automatic_ship_placer import AutomaticPlacer
 from game_objects.fieldCell import ShipCell
 from game_objects.rotation import Rotation
 from game_objects.ship import Ship
@@ -134,7 +134,7 @@ class BotGameStrategyHard(BotGameStrategy):
 
 class BotShipPlacementStrategyEasy(BotShipPlacementStrategy):
     def place_ships(self):
-        while not AutomaticShipPlacer.try_set_ships_randomly(self.own_field):
+        while not AutomaticPlacer.try_set_ships_randomly(self.own_field):
             pass
 
 

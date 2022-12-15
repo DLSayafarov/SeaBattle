@@ -2,7 +2,7 @@ import enum
 from typing import Callable, Union
 from game.game_settings import GameSettings
 from game_objects.field import Field, Ship, Vector2
-from game_objects.automatic_ship_placer import AutomaticShipPlacer
+from game_objects.automatic_ship_placer import AutomaticPlacer
 from game_objects.fieldCell import ShipCell, CellType
 from players.player import Player
 from players.bot import Bot
@@ -44,7 +44,13 @@ class Game:
     def place_ship_automatically(self):
         if self.game_state != GameState.ShipPlacing:
             raise Exception("Ошибка состояний игры")
-        if not AutomaticShipPlacer.try_set_ships_randomly(field=self.get_current_player().own_field):
+        if not AutomaticPlacer.try_set_ships_randomly(field=self.get_current_player().own_field):
+            raise Warning("Не удалось расставить корабли автоматически")
+
+    def place_one_cell_objects_automatically(self):
+        if self.game_state != GameState.ShipPlacing:
+            raise Exception("Ошибка состояний игры")
+        if not AutomaticPlacer.try_set_ocb_randomly(field=self.get_current_player().own_field):
             raise Warning("Не удалось расставить корабли автоматически")
 
     def try_place_ship(self, ship: Ship, x=-1, y=-1):
@@ -54,11 +60,25 @@ class Game:
             ship.pos = Vector2(x, y)
         return self.get_current_player().own_field.try_place_ship(ship)
 
+    def try_place_one_cell_object(self, cell_type: CellType, x: int, y: int):
+        if self.game_state != GameState.ShipPlacing:
+            raise Exception("Ошибка состояний игры")
+        return self.get_current_player().own_field.try_place_one_cell_object(cell_type, x, y)
+
     def try_remove_ship(self, ship: Ship):
         if self.game_state != GameState.ShipPlacing:
             raise Exception("Ошибка состояний игры")
         try:
             self.fields[self.turn].remove_ship(ship)
+        except:
+            return False
+        return True
+
+    def try_remove_one_cell_object(self, x: int, y: int):
+        if self.game_state != GameState.ShipPlacing:
+            raise Exception("Ошибка состояний игры")
+        try:
+            self.fields[self.turn].remove_one_cell_object(x, y)
         except:
             return False
         return True
