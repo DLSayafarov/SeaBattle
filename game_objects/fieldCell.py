@@ -1,7 +1,7 @@
 import enum
 from abc import ABC
-
 from game_objects.ship import Ship
+from game_objects.vector2 import Vector2
 
 
 class CellType(enum.IntEnum):
@@ -18,11 +18,16 @@ class FieldCell(ABC):
     char = " "
     char_shooted = " "
     is_declassified = False
+    pos: Vector2
+
+    def __init__(self, pos=Vector2(-1, -1)):
+        self.pos = pos
 
     def shoot_down(self):
         if self.is_shoot_down:
             raise Warning("Already shoot down")
         self.is_shoot_down = True
+        self.is_declassified = True
 
     def __str__(self):
         return [self.char, self.char_shooted][self.is_shoot_down]
@@ -45,26 +50,21 @@ class ShipCell(FieldCell):
     cell_type = CellType.ShipCell
 
     def shoot_down(self):
-        if self.is_shoot_down:
-            raise Warning("Already shoot down")
-        self.is_shoot_down = True
+        super().shoot_down()
         self.ship.shoot_down()
 
     def __init__(self, ship: Ship):
+        super().__init__()
         self.ship = ship
 
 
-class OneCellObject(FieldCell, ABC):
-    pass
-
-
-class MineCell(OneCellObject):
+class MineCell(FieldCell):
     char = "b"
     char_shooted = "B"
     cell_type = CellType.MineCell
 
 
-class MinesweeperCell(OneCellObject):
+class MinesweeperCell(FieldCell):
     char = "m"
     char_shooted = "M"
     cell_type = CellType.MinesweeperCell

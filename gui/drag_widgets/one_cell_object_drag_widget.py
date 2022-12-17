@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from typing import Callable
 
-from game_objects.fieldCell import CellType
+from game_objects.fieldCell import CellType, FieldCell
 from game_objects.ship import Ship
 from game_objects.rotation import Rotation
 from game_objects.vector2 import Vector2
@@ -9,20 +9,19 @@ from gui.ui_base import images_source
 
 
 class OneCellObjectWidget(QtWidgets.QLabel):
-    def __init__(self, cell_type: CellType, cell_size: int, on_widget_taking: Callable[[QtWidgets.QWidget], None],
+    def __init__(self, cell: FieldCell, cell_size: int, on_widget_taking: Callable[[QtWidgets.QWidget], None],
                  on_widget_realise: Callable[[QtWidgets.QWidget], None], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.scale = cell_size / 80
-        self.cell_type = cell_type
+        self.cell = cell
         self.base_parent_widget = self.parentWidget()
         self.on_widget_taking = on_widget_taking
         self.on_widget_realise = on_widget_realise
-        self.field_pos = Vector2(-1, -1)
         self.set_pixmap()
 
     def set_pixmap(self):
-        pixmap = QtGui.QPixmap(images_source.get_one_cell_object_by_cell_type(self.cell_type))
+        pixmap = QtGui.QPixmap(images_source.get_one_cell_object(self.cell))
         size = [pixmap.width() * self.scale, pixmap.height() * self.scale]
         self.setFixedSize(*size)
         self.setPixmap(pixmap.scaled(*size, QtCore.Qt.IgnoreAspectRatio))

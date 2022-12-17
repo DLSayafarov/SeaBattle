@@ -6,7 +6,7 @@ from game.game import Game, GameState
 import gui.dialog_window as DW
 from game_objects.fieldCell import CellType
 from gui.ui import UI
-from gui.ui_base.field_drawer import FieldDrawer
+from gui.field_drawer import FieldDrawer
 
 
 HIT_PHRASES = ["Есть пробитие!", "Сюдаааа!!!", "В яблочко!", "Изи", "Есть попадание!", "Подстрелил!"]
@@ -41,6 +41,7 @@ class GameUI(UI):
         self.ui.back_button.clicked.connect(self._on_back_button_click)
         self._draw_fields()
         self.ui.second_field_label.mousePressEvent = self._on_enemy_field_click
+        self.ui.first_field_label.mousePressEvent = self._on_own_field_click
         width, height = self.game.game_settings.field_properties.width, self.game.game_settings.field_properties.height
         self.cell_size = 500 // max(width, height)
         self.game.on_game_state_change = lambda: self._on_game_change()
@@ -81,10 +82,11 @@ class GameUI(UI):
 
     def _on_game_change(self):
         self._draw_fields()
-        if self.game.game_settings.second_player_properties.is_real_player and self.game.game_state == GameState.Confirmation:
-            self.ui.turn_acception_label.setText(f"Игрок {self.game.turn + 1}")
-            self.ui.confirm_window.show()
-        elif self.game.game_state == GameState.Battle:
+        if self.game.game_state == GameState.Confirmation:
+            if self.game.game_settings.second_player_properties.is_real_player:
+                self.ui.turn_acception_label.setText(f"Игрок {self.game.turn + 1}")
+                self.ui.confirm_window.show()
+        elif self.game.game_state in [GameState.Battle, GameState.Waiting]:
             self.ui.turn_label.setText(f"ход игрока {self.game.turn + 1}")
         elif self.game.game_state == GameState.EndGame:
             self.ui.state_label.setStyleSheet("color: green;")
@@ -92,7 +94,17 @@ class GameUI(UI):
             if not self.game.game_settings.second_player_properties.is_real_player:
                 self.game.turn = 0
             self._draw_fields(True)
+        elif self.game.game_state == GameState.Declassifying:
+            text = "кораблём" if self.game.need_declassify == CellType.ShipCell else "миной"
+            self.ui.turn_label.setText(f"Выберите клетку с {text} для расскрытия")
+
+    def _on_own_field_click(self, event: QtGui.QMouseEvent):
+        if self.game.game_state != GameState.Declassifying:
             return
+        in_label_pos = event.globalPos() - self.ui.first_field_label.mapToGlobal(QtCore.QPoint(0, 0))
+        x, y = in_label_pos.x() / self.cell_size, in_label_pos.y() / self.cell_size
+        x, y = round(x - 0.5), round(y - 0.5)
+        self.game.try_declassify_cell(x, y)
 
     def _on_accept_turn_button_click(self):
         self.game.confirm_turn_start()
@@ -109,6 +121,3 @@ class GameUI(UI):
         self.ui = None
         self.game = None
         self.main_window = None
-
-    def __del__(self):
-        print("deleted", self)

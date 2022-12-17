@@ -3,6 +3,7 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QLabel
 
 from game_objects.field import Field
+from game_objects.fieldCell import CellType
 from gui.ui_base import images_source
 
 
@@ -50,6 +51,24 @@ class FieldDrawer:
             ship_label.move(x, y)
             ship_label.show()
             labels.append(ship_label)
+
+        for i in range(field.height):
+            for j in range(field.width):
+                cell = field[i][j]
+                if only_marked and not cell.is_declassified and not cell.is_shoot_down:
+                    continue
+                ocb_label = QLabel(label)
+                image_path = images_source.get_one_cell_object(cell)
+                if image_path is None:
+                    continue
+                pixmap = QtGui.QPixmap(image_path)
+                size = [pixmap.width() * scale, pixmap.height() * scale]
+                ocb_label.setFixedSize(*size)
+                ocb_label.setPixmap(pixmap.scaled(*size, QtCore.Qt.IgnoreAspectRatio))
+                x, y = cell_size * cell.pos.x, cell_size * cell.pos.y
+                ocb_label.move(x, y)
+                ocb_label.show()
+                labels.append(ocb_label)
 
         return labels
 

@@ -1,5 +1,5 @@
 from game_objects.field import Field, Ship, Vector2
-from game_objects.fieldCell import CellType
+from game_objects.fieldCell import CellType, FieldCell
 from game_objects.rotation import Rotation
 from random import Random
 
@@ -38,12 +38,13 @@ class AutomaticPlacer:
         return False
 
     @staticmethod
-    def try_place_ocb(field: Field, ocb_type: CellType):
+    def try_place_ocb(field: Field, object_cell: FieldCell):
         rand = Random()
         for i in range(AutomaticPlacer.ATTEMPTS_TO_PLACE):
             x = rand.randint(0, field.width - 1)
             y = rand.randint(0, field.height - 1)
-            res = field.try_place_one_cell_object(ocb_type, x, y)
+            object_cell.pos = Vector2(x, y)
+            res = field.try_place_one_cell_object(object_cell)
             if res:
                 return True
         return False
@@ -53,8 +54,8 @@ class AutomaticPlacer:
         for j in range(AutomaticPlacer.ATTEMPTS_TO_RANDOMLY_SET):
             set_suc = True
             while field.one_cell_objects_to_place:
-                ocb_type = next(iter(field.one_cell_objects_to_place))
-                if not AutomaticPlacer.try_place_ocb(field, ocb_type):
+                object_cell = next(iter(field.one_cell_objects_to_place))
+                if not AutomaticPlacer.try_place_ocb(field, object_cell):
                     set_suc = False
                     field.clear_ocb()
                     break

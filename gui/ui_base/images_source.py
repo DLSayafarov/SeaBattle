@@ -16,8 +16,11 @@ def get_particle_by_cell(field_cell: FieldCell):
     return None
 
 
-def get_one_cell_object_by_cell_type(cell_type: CellType):
-    if cell_type == CellType.MineCell:
-        return f"gui/sprites/mine.png"
-    if cell_type == CellType.MinesweeperCell:
-        return f"gui/sprites/minesweeper.png"
+def get_one_cell_object(cell: FieldCell):
+    if cell.cell_type == CellType.MineCell:
+        return f"gui/sprites/mine{'_d' * int(not cell.is_shoot_down)}.png"
+    if cell.cell_type == CellType.MinesweeperCell:
+        return f"gui/sprites/minesweeper{'_d' * int(not cell.is_shoot_down)}.png"
+    if cell.cell_type == CellType.ShipCell and cell.is_declassified and not cell.is_shoot_down:
+        return "gui/sprites/ship_d.png"
+    return None

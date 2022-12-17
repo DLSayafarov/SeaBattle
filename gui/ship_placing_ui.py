@@ -1,12 +1,12 @@
 from typing import Callable
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 import gui.ui_base.ship_placing_ui as ship_placing_ui
 from gui.drag_widgets.one_cell_object_drag_widget import OneCellObjectWidget
 from gui.drag_widgets.ship_drag_widget import ShipWidget
 from game.game import Game, GameState
 import gui.dialog_window as DW
 from gui.ui import UI
-from gui.ui_base.field_drawer import FieldDrawer
+from gui.field_drawer import FieldDrawer
 
 
 class ShipPlacingUI(UI):
@@ -35,11 +35,11 @@ class ShipPlacingUI(UI):
             self.ui.ship_area_layout.layout().addWidget(ship_widget)
 
     def _on_one_cell_object_taking(self, ocb_widget: OneCellObjectWidget):
-        self.game.try_remove_one_cell_object(ocb_widget.field_pos.x, ocb_widget.field_pos.y)
+        self.game.try_remove_one_cell_object(ocb_widget.cell)
 
     def _on_one_cell_object_realise(self, ocb_widget: OneCellObjectWidget):
         x, y = self._get_pos_in_field(ocb_widget.pos())
-        if self.game.try_place_one_cell_object(ocb_widget.cell_type, x, y):
+        if self.game.try_place_one_cell_object(ocb_widget.cell, x, y):
             pos_in_field = QtCore.QPoint(x * self.cell_size, y * self.cell_size)
             new_pos = self.ui.field_label.pos() + pos_in_field
             ocb_widget.move(new_pos)
@@ -71,8 +71,8 @@ class ShipPlacingUI(UI):
             DW.show_warning_window(e)
         else:
             for ocb_widget in self.one_cell_objects_widgets:
-                in_field_pos = QtCore.QPoint(ocb_widget.field_pos.x * self.cell_size,
-                                             ocb_widget.field_pos.y * self.cell_size)
+                in_field_pos = QtCore.QPoint(ocb_widget.cell.pos.x * self.cell_size,
+                                             ocb_widget.cell.pos.y * self.cell_size)
                 ocb_widget.setParent(ocb_widget.base_parent_widget)
                 ocb_widget.set_pixmap()
                 ocb_widget.move(self.ui.field_label.pos() + in_field_pos)
@@ -81,6 +81,10 @@ class ShipPlacingUI(UI):
         for ship_widget in self.ships_widgets:
             if self.game.try_remove_ship(ship_widget.ship):
                 self.ui.ship_area_layout.layout().addWidget(ship_widget)
+
+        for ocb_widget in self.one_cell_objects_widgets:
+            if self.game.try_remove_one_cell_object(ocb_widget.cell):
+                self.ui.other_objects_area_layout.layout().addWidget(ocb_widget)
 
     @staticmethod
     def setup_ui(MainWindow: QtWidgets.QMainWindow, on_ui_change: Callable, game: Game = None):
@@ -131,8 +135,7 @@ class ShipPlacingUI(UI):
     def clear(self):
         for x in self.ships_widgets:
             x.deleteLater()
+        for x in self.one_cell_objects_widgets:
+            x.deleteLater()
         self.ships_widgets = None
         self.ui = None
-
-    def __del__(self):
-        print("deleted", self)

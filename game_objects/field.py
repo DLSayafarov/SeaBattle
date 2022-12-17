@@ -1,5 +1,5 @@
 import game_objects.common as Common
-from game_objects.fieldCell import FieldCell, EmptyCell, ShipCell, OneCellObject, CellType
+from game_objects.fieldCell import FieldCell, EmptyCell, ShipCell, CellType
 from game_objects.ship import Ship
 from game_objects.vector2 import Vector2
 
@@ -43,6 +43,8 @@ class Field:
     height: int
     ships: set[Ship]
     ships_to_place: set[Ship]
+    one_cell_objects_to_place: list[FieldCell]
+    one_cell_objects: list[FieldCell]
 
     def __init__(self, field_properties: FieldProperties):
         self.field = [[EmptyCell() for __ in range(field_properties.width)] for _ in range(field_properties.height)]
@@ -50,7 +52,7 @@ class Field:
         self.height = field_properties.height
         self.ships = set()
         self.ships_to_place = set([Ship(ship_len=x) for x in field_properties.ships_lens])
-        self.one_cell_objects_to_place = field_properties.one_cell_objects
+        self.one_cell_objects_to_place = [FieldCell.get_by_cell_type(x)() for x in field_properties.one_cell_objects]
         self.one_cell_objects = []
 
     def __getitem__(self, key: int):
@@ -64,12 +66,13 @@ class Field:
         for i in range(self.height):
             for j in range(self.width):
                 if self[i][j].cell_type in [CellType.MineCell, CellType.MinesweeperCell]:
-                    self.remove_one_cell_object(i, j)
+                    self.remove_one_cell_object(self[i][j])
 
     def is_inside(self, pos: Vector2):
         return 0 <= pos.x < self.width and 0 <= pos.y < self.height
 
-    def try_place_one_cell_object(self, object_cell: CellType, x: int, y: int):
+    def try_place_one_cell_object(self, object_cell: FieldCell):
+        x, y = object_cell.pos.x, object_cell.pos.y
         if object_cell not in self.one_cell_objects_to_place:
             return False
 
@@ -77,10 +80,10 @@ class Field:
             return False
 
         for p in Common.get_neighbours(Vector2(x, y)):
-            if self.is_inside(p) and self[y][x].cell_type != CellType.EmptyCell:
+            if self.is_inside(p) and self[p.y][p.x].cell_type != CellType.EmptyCell:
                 return False
 
-        self[y][x] = FieldCell.get_by_cell_type(object_cell)()
+        self[y][x] = object_cell
         self.one_cell_objects.append(object_cell)
         self.one_cell_objects_to_place.remove(object_cell)
         return True
@@ -99,6 +102,7 @@ class Field:
 
         for p in ship.parts:
             self[p.y][p.x] = ShipCell(ship)
+            self[p.y][p.x].pos = p
 
         ship.on_defeat = lambda: self.ship_boom(ship)
         self.ships.add(ship)
@@ -112,11 +116,11 @@ class Field:
             self.ships.remove(ship)
             self.ships_to_place.add(ship)
 
-    def remove_one_cell_object(self, x: int, y: int):
-        if self[y][x].cell_type in self.one_cell_objects:
-            self[y][x] = EmptyCell()
-            self.one_cell_objects.remove(self[y][x].cell_type)
-            self.one_cell_objects_to_place.append(self[y][x].cell_type)
+    def remove_one_cell_object(self, object_cell: FieldCell):
+        if object_cell in self.one_cell_objects:
+            self[object_cell.pos.y][object_cell.pos.x] = EmptyCell()
+            self.one_cell_objects.remove(object_cell)
+            self.one_cell_objects_to_place.append(object_cell)
 
     def try_to_shoot(self, pos: Vector2):
         if not self.is_inside(pos):
@@ -136,6 +140,9 @@ class Field:
         for line in self:
             s.append(" ".join([str(x) if show_not_shooted or x.is_shoot_down else '·' for x in line]))
         return "\n".join(s)
+
+    def declassified_cell(self, x: int, y: int):
+        self[y][x].is_declassified = True
 
     def __repr__(self):
         return self.to_string()

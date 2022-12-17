@@ -56,6 +56,3 @@ class MenuUI(UI):
         self.ui.second_player_bot_rb.clicked.connect(self.ui.bot_settings.show)
         self.ui.second_player_hotseat_rb.clicked.connect(self.ui.bot_settings.hide)
         self.ui.game_start_button.clicked.connect(self._on_start_button_click)
-
-    def __del__(self):
-        print("deleted", self)

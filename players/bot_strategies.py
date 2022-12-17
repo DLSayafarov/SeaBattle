@@ -3,7 +3,7 @@ from abc import ABC
 from random import Random
 from game_objects.field import Field
 from game_objects.automatic_ship_placer import AutomaticPlacer
-from game_objects.fieldCell import ShipCell
+from game_objects.fieldCell import ShipCell, CellType
 from game_objects.rotation import Rotation
 from game_objects.ship import Ship
 from game_objects.vector2 import Vector2
@@ -126,21 +126,46 @@ class BotGameStrategyHard(BotGameStrategy):
                     prop += 9999
                 else:
                     return 0
+            if cell.is_declassified:
+                if cell.cell_type == CellType.ShipCell:
+                    prop += 9999
+                else:
+                    return 0
         return prop
-
-
-
 
 
 class BotShipPlacementStrategyEasy(BotShipPlacementStrategy):
     def place_ships(self):
         while not AutomaticPlacer.try_set_ships_randomly(self.own_field):
             pass
+        while not AutomaticPlacer.try_set_ocb_randomly(self.own_field):
+            pass
 
 
 class BotShipPlacementStrategyHard(BotShipPlacementStrategy):
     def place_ships(self):
-        pass
+        ships = list(self.own_field.ships_to_place)
+        ships.sort(key=lambda s: s.len)
+        big_ships = ships[min(len(ships), 4):][::-1]
+        i, j = 0, 0
+        while i < self.own_field.height:
+            j = 0
+            while j < self.own_field.width:
+                space = self.own_field.width - j
+                for x in big_ships:
+                    if x.len <= space:
+                        x.rotation = Rotation.Horizontal
+                        x.pos = Vector2(j, i)
+                        self.own_field.try_place_ship(x)
+                        big_ships.remove(x)
+                        print(i, j, "->", end=' ')
+                        j += x.len
+                        print(i, j)
+                        break
+                j += 1
+            i += 2
+        AutomaticPlacer.try_set_ships_randomly(self.own_field)
+        AutomaticPlacer.try_set_ocb_randomly(self.own_field)
 
 
 __BOT_GAME_STRATEGY_BY_DIFFICULTY = {Difficulty.Easy: BotGameStrategyEasy,
