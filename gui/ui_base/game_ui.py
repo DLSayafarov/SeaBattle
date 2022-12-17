@@ -12,6 +12,23 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.centralwidget = None
+        self.first_field_label = None
+        self.label_3 = None
+        self.label_2 = None
+        self.turn_label = None
+        self.back_button = None
+        self.second_field_label = None
+        self.label_4 = None
+        self.label = None
+        self.state_label = None
+        self.confirm_window = None
+        self.turn_label_4 = None
+        self.turn_label_5 = None
+        self.accept_turn = None
+        self.turn_acception_label = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1500, 800)

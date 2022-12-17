@@ -10,6 +10,7 @@ class ShipWidget(QtWidgets.QLabel):
                  on_widget_realise: Callable[[QtWidgets.QWidget], None], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.mouse_click_offset = None
         self.scale = cell_size / 80
         self.ship = ship
         self.base_parent_widget = self.parentWidget()

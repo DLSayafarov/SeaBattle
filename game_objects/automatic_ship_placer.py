@@ -1,7 +1,8 @@
-from game_objects.field import Field, Ship, Vector2
-from game_objects.fieldCell import CellType, FieldCell
-from game_objects.rotation import Rotation
 from random import Random
+
+from game_objects.field import Field, Ship, Vector2
+from game_objects.fieldCell import FieldCell
+from game_objects.rotation import Rotation
 
 
 class AutomaticPlacer:

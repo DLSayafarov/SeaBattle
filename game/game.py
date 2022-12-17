@@ -1,11 +1,12 @@
 import enum
 from typing import Callable, Union
+
 from game.game_settings import GameSettings
-from game_objects.field import Field, Ship, Vector2
 from game_objects.automatic_ship_placer import AutomaticPlacer
-from game_objects.fieldCell import ShipCell, CellType, FieldCell
-from players.player import Player
+from game_objects.field import Field, Ship, Vector2
+from game_objects.fieldCell import CellType, FieldCell
 from players.bot import Bot
+from players.player import Player
 
 
 class GameState(enum.IntEnum):

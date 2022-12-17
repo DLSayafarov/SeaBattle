@@ -2,6 +2,38 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.centralwidget = None
+        self.game_start_button = None
+        self.widget_5 = None
+        self.widget_6 = None
+        self.label_8 = None
+        self.second_player_hotseat_rb = None
+        self.second_player_bot_rb = None
+        self.bot_settings = None
+        self.label_11 = None
+        self.widget_3 = None
+        self.bot_ship_placing_difficult_hard_rb = None
+        self.bot_ship_placing_difficult_easy_rb = None
+        self.label_10 = None
+        self.widget_2 = None
+        self.bot_game_difficult_hard_rb = None
+        self.bot_game_difficult_easy_rb = None
+        self.label_9 = None
+        self.widget_11 = None
+        self.label_6 = None
+        self.mines_count = None
+        self.label_4 = None
+        self.ships_lens = None
+        self.label_5 = None
+        self.game_field_height = None
+        self.game_field_width = None
+        self.label_3 = None
+        self.label_7 = None
+        self.minesweepers_count = None
+        self.label_2 = None
+        self.label = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1500, 800)

@@ -1,10 +1,8 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
 from typing import Callable
 
-from game_objects.fieldCell import CellType, FieldCell
-from game_objects.ship import Ship
-from game_objects.rotation import Rotation
-from game_objects.vector2 import Vector2
+from PyQt5 import QtWidgets, QtGui, QtCore
+
+from game_objects.fieldCell import FieldCell
 from gui.ui_base import images_source
 
 
@@ -13,6 +11,7 @@ class OneCellObjectWidget(QtWidgets.QLabel):
                  on_widget_realise: Callable[[QtWidgets.QWidget], None], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.mouse_click_offset = None
         self.scale = cell_size / 80
         self.cell = cell
         self.base_parent_widget = self.parentWidget()

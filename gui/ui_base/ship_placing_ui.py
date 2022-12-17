@@ -12,6 +12,25 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
+    def __init__(self):
+        self.centralwidget = None
+        self.accept_button = None
+        self.reset_button = None
+        self.label_3 = None
+        self.label_2 = None
+        self.turn_label = None
+        self.ships_area = None
+        self.ship_area_layout = None
+        self.verticalLayout = None
+        self.back_button = None
+        self.other_objects_area = None
+        self.other_objects_area_layout = None
+        self.verticalLayout_4 = None
+        self.label_5 = None
+        self.auto_ship_place_button = None
+        self.auto_ocb_place_button = None
+        self.field_label = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1500, 800)

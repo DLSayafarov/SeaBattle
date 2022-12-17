@@ -1,7 +1,7 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
+
 from gui.menu_ui import MenuUI
 from gui.ui import UI
-
 
 CURRENT_UI: UI = None
 

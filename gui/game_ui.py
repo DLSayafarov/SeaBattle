@@ -8,7 +8,6 @@ from game_objects.fieldCell import CellType
 from gui.ui import UI
 from gui.field_drawer import FieldDrawer
 
-
 HIT_PHRASES = ["Есть пробитие!", "Сюдаааа!!!", "В яблочко!", "Изи", "Есть попадание!", "Подстрелил!"]
 MISS_PHRASES = ["Oh sheesh", "Мимо!", "Не попал!", "Сплоховал!"]
 

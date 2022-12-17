@@ -1,11 +1,13 @@
 from typing import Callable
-from PyQt5 import QtWidgets, QtGui, QtCore
-from game.game_settings import GameSettings, FieldProperties, PlayerProperties
-from players.difficulty import Difficulty
+
+from PyQt5 import QtWidgets
+
+import gui.dialog_window as DW
 import gui.ui_base.menu_ui as menu_ui
 from game.game import Game
-import gui.dialog_window as DW
+from game.game_settings import GameSettings, FieldProperties, PlayerProperties
 from gui.ui import UI
+from players.difficulty import Difficulty
 
 
 class MenuUI(UI):
